@@ -12,6 +12,8 @@ const SESSION_SECRET = process.env.SESSION_SECRET;
 
 app.use(express.urlencoded({ extended: false }));
 
+app.use(express.static(path.join(__dirname, "..", "public")));
+
 app.use(
     cookieSession({
         name: "session",
@@ -26,6 +28,10 @@ function requireAuth(req, res, next) {
     if (req.session?.user) return next();
     return res.redirect("/login");
 }
+
+app.get("/", requireAuth, (req, res) => {
+    res.redirect("/home");
+});
 
 app.get("/home", requireAuth, (req, res) => {
     res.sendFile(path.join(process.cwd(), "private", "home.html"));
@@ -51,13 +57,14 @@ app.post("/logout", (req, res) => {
     return res.redirect("/login");
 });
 
-app.get("/", requireAuth, (req, res) => {
-    res.sendFile(path.join(process.cwd(), "private", "app.html"));
+app.get("/vampirul-character-network", requireAuth, (req, res) => {
+    res.sendFile(path.join(process.cwd(), "private", "vampirul-character-network.html"));
 });
 
-app.get("/network_data.json", requireAuth, (req, res) => {
+app.get("/vampirul-network-data.json", requireAuth, (req, res) => {
     res.setHeader("Cache-Control", "no-store");
-    res.sendFile(path.join(process.cwd(), "private", "network_data.json"));
+    res.sendFile(path.join(process.cwd(), "private", "vampirul-network-data.json"));
 });
+
 
 module.exports = app;
